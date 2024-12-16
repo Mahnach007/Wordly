@@ -1,11 +1,18 @@
 import SwiftUI
 
 struct CardComponent: View {
-    var word: String = "Car"
-    var definition: String = "La machina"
+    
+    @Binding var word: String
+    @Binding var definition: String
+    
     var language: String = "Choose Language"
     let offset = 5.0
-    @State private var suggestions: [String] = ["Suggerimento 1", "Suggerimento 2", "Suggerimento 3"] // Sample suggestions
+    
+//    @State var isSaved: Bool = false
+//    
+//    var onSave: ((String, String) -> Void)?
+    
+    //@State private var suggestions: [String] = ["Suggerimento 1", "Suggerimento 2", "Suggerimento 3"] // Sample suggestions
 
     var body: some View {
         ZStack {
@@ -25,33 +32,52 @@ struct CardComponent: View {
 
             // Content
             VStack {
-                UnderlineTextField(wordType: "Word")
-                UnderlineTextField(text: "cecw", wordType: "Definition")
-
-                
+                UnderlineTextField(text: $word, wordType: "Word")
+                UnderlineTextField(text: $definition, wordType: "Definition")
             }
             .padding()
+            
+//            if !isSaved {
+//                HStack {
+//                    Spacer()
+//                    VStack {
+//                        Button("Save") {
+//                            isSaved = true
+//                            onSave?(word, definition)
+//                        }
+//                        .foregroundStyle(.white)
+//                        Spacer()
+//                    }
+//                }
+//            }
         }
-        .frame(maxWidth: .infinity, maxHeight: 50 * CGFloat((1 + suggestions.count))) // Remove fixed maxHeight to allow it to expand
+        .frame(maxWidth: .infinity)
         .padding()
     }
+
 }
 
 struct UnderlineTextField: View {
-    
-    @State var text = ""
+    @Binding var text: String
     @State var wordType = ""
     @State var language = "Choose Language"
-    @State private var suggestions: [String] = ["everv", "rever"] // Sample suggestions
-
+    @State private var suggestions: [String] = ["Suggestion 1", "Suggestion 2", "Suggestion 3"] // Sample suggestions
+    @State private var showSuggestions: Bool = false // Controls suggestion visibility
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 8) {
             // Text input field
             HStack {
                 TextField("", text: $text)
                     .title3Style()
                     .underlineTextField()
+                    .onChange(of: text) { newValue in
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            // Dynamically update suggestions based on text input
+                            updateSuggestions(for: newValue)
+                            showSuggestions = !newValue.isEmpty
+                        }
+                    }
             }
 
             // Label and button
@@ -65,37 +91,57 @@ struct UnderlineTextField: View {
                 }
             }
             .padding(.horizontal)
-            if text.isEmpty {
-                
-            } else {
-                VStack(alignment: .leading, spacing: 3) {
-                    ForEach(suggestions, id: \.self) { suggestion in
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(AppColors.shadowBlue)
-                            .frame(maxWidth: .infinity, minHeight: 30)
-                            .overlay(
-                                Text(suggestion).title3Style()                                .padding(.horizontal, 8),
-                                alignment: .leading
-                            )
-                            .padding(.horizontal, 1)
+
+            if showSuggestions {
+                CardComponentSuggestion(suggestions: suggestions, onSelect: { selectedSuggestion in
+                    text = selectedSuggestion // Set text to selected suggestion
+                    withAnimation {
+                        showSuggestions = false // Hide suggestions
                     }
-                }
+                })
+                .transition(.move(edge: .top).combined(with: .opacity)) // Smooth appearance
+            }
+        }
+    }
+
+    private func updateSuggestions(for input: String) {
+        if input.isEmpty {
+            suggestions = []
+        } else {
+            // Mock: Filter based on text
+            suggestions = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
+                .filter { $0.lowercased().contains(input.lowercased()) }
+        }
+    }
+}
+
+struct CardComponentSuggestion: View {
+    var suggestions: [String]
+    var onSelect: (String) -> Void // Callback for selection
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            ForEach(suggestions, id: \.self) { suggestion in
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(AppColors.shadowBlue)
+                    .frame(maxWidth: .infinity, minHeight: 30)
+                    .overlay(
+                        Text(suggestion)
+                            .title3Style()
+                            .padding(.horizontal, 8),
+                        alignment: .leading
+                    )
+                    .padding(.horizontal, 1)
+                    .onTapGesture {
+                        onSelect(suggestion) // Pass the selected suggestion
+                    }
             }
         }
     }
 }
 
-extension View {
-    func underlineTextField() -> some View {
-        self
-            .padding(.vertical, 10)
-            .overlay(Rectangle().frame(height: 2).padding(.top, 35))
-            .shadow(radius: 3, y: -4)
-            .foregroundStyle(Color.white)
-            .foregroundColor(AppColors.shadowBlue)
-    }
-}
+
 
 #Preview {
-    CardComponent()
+    CardComponent(word: .constant(""), definition: .constant(""))
 }

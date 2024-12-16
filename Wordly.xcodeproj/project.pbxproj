@@ -54,6 +54,11 @@
 			path = ViewComponents;
 			sourceTree = "<group>";
 		};
+		F580C0D62D0F6DA70000A5E1 /* ViewExtensions */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ViewExtensions;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +75,7 @@
 		F55EB3212D08E76200CAA3FD = {
 			isa = PBXGroup;
 			children = (
+				F580C0D62D0F6DA70000A5E1 /* ViewExtensions */,
 				F55EB34D2D08F20700CAA3FD /* ViewComponents */,
 				F55EB34A2D08F1A200CAA3FD /* ViewModels */,
 				F55EB3482D08EF9900CAA3FD /* Models */,
@@ -110,6 +116,7 @@
 				F55EB3482D08EF9900CAA3FD /* Models */,
 				F55EB34A2D08F1A200CAA3FD /* ViewModels */,
 				F55EB34D2D08F20700CAA3FD /* ViewComponents */,
+				F580C0D62D0F6DA70000A5E1 /* ViewExtensions */,
 			);
 			name = Wordly;
 			packageProductDependencies = (
@@ -309,7 +316,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -340,7 +347,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+
+class AddCardViewModel: ObservableObject {
+    
+    @Published var cards: [CardComponent] = []
+    
+    
+    func addCard(_ card: CardComponent) {
+        cards.append(card)
+    }
+}

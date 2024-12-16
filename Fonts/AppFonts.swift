@@ -12,6 +12,7 @@ struct AppFonts {
     static let title1: Font = .custom("feather", size: 34)
     static let title3: Font = .custom("feather", size: 17)
     static let body1: Font = .custom("feather", size: 12)
+    static let smallIcon: Font = .custom("feather", size: 25)
 }
 
 
@@ -51,5 +52,9 @@ extension View {
     
     func buttonStyle() -> some View {
         modifier(TextAndColorModifier(font: AppFonts.body1, color: AppColors.buttonColor))
+    }
+    
+    func smallIconStyle() -> some View {
+        modifier(TextAndColorModifier(font: AppFonts.smallIcon, color: AppColors.title1))
     }
 }

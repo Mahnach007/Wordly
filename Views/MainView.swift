@@ -4,10 +4,11 @@ import SwiftData
 struct MainView: View {
     @State private var searchText = ""
     @State private var showAddCardPack = false
-    
+    @State private var showCardPack = false
     
     @Environment(\.modelContext) private var modelContext
     @Query private var cardPacks: [CardPack]
+    @State private var selectedCardPack: CardPack?
     
     @Namespace private var namespace
     private let zoomID = UUID()
@@ -24,17 +25,18 @@ struct MainView: View {
                                 title: cardPack.name,
                                 count: cardPack.cards.count,
                                 onTap: {
-                                    cardPack.cards.forEach { card in
-                                        print(card.frontText)
-                                        print(card.backText)
-                                    }
+                                    showCardPack = true
+                                    selectedCardPack = cardPack
                                 },
                                 onLongPress: {
                                     deleteCardPack(cardPack: cardPack)
                                 }
-                            ).padding(.horizontal, 10)
+                            )
+                            .padding(.horizontal, 10)
                             .padding(.top, 15)
+                            
                         }
+                
                     }
                     //.searchable(text: $searchText)
                     .toolbar {
@@ -73,6 +75,11 @@ struct MainView: View {
                 .navigationDestination(isPresented: $showAddCardPack) {
                     AddCardPackView()
                         .withZoomTransition(id: zoomID, namespace: namespace)
+                }
+                .navigationDestination(isPresented: $showCardPack) {
+                    if let selectedCardPack {
+                        FlashCardsView(cardPack: selectedCardPack)
+                    }
                 }
             }
         }

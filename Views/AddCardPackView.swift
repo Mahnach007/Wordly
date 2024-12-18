@@ -30,7 +30,9 @@ struct AddCardPackView: View {
                     ForEach(flashCards.indices, id: \.self) { index in
                         CardComponent(
                             word: $flashCards[index].text,
-                            definition: $flashCards[index].definition
+                            definition: $flashCards[index].definition,
+                            language: "enq"
+
                         )
                     }
                 }

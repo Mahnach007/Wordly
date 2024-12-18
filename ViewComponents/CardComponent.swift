@@ -74,8 +74,8 @@ struct UnderlineTextField: View {
                     .onChange(of: text) { newValue in
                         withAnimation(.easeInOut(duration: 0.3)) {
                             // Dynamically update suggestions based on text input
-                            updateSuggestions(for: newValue)
-                            showSuggestions = !newValue.isEmpty
+                            //updateSuggestions(for: newValue)
+                            //showSuggestions = !newValue.isEmpty
                         }
                     }
             }
@@ -104,15 +104,15 @@ struct UnderlineTextField: View {
         }
     }
 
-    private func updateSuggestions(for input: String) {
-        if input.isEmpty {
-            suggestions = []
-        } else {
-            // Mock: Filter based on text
-            suggestions = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
-                .filter { $0.lowercased().contains(input.lowercased()) }
-        }
-    }
+//    private func updateSuggestions(for input: String) {
+//        if input.isEmpty {
+//            suggestions = []
+//        } else {
+//            // Mock: Filter based on text
+//            suggestions = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
+//                .filter { $0.lowercased().contains(input.lowercased()) }
+//        }
+//    }
 }
 
 struct CardComponentSuggestion: View {

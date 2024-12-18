@@ -13,15 +13,15 @@ class FlashCard {
     @Attribute(.unique) var id: UUID
     var frontText: String // Text on the front of the card
     var backText: String // Text on the back of the card
-    //var isMastered: Bool // Whether the card is mastered
+    var isMastered: Bool // Whether the card is mastered
     //var lastReviewedAt: Date? // When the card was last reviewed
     @Relationship var cardPack: CardPack // Reference to parent CardPack
 
-    init(frontText: String, backText: String, cardPack: CardPack) {
+    init(frontText: String, backText: String, cardPack: CardPack, isMastered: Bool = false) {
         self.id = UUID()
         self.frontText = frontText
         self.backText = backText
-        //self.isMastered = false
+        self.isMastered = isMastered
         //self.lastReviewedAt = nil
         self.cardPack = cardPack
     }

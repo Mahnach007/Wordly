@@ -1,41 +1,29 @@
-
 import SwiftUI
 import SwiftData
 import AVFoundation
 
 struct FlashCardsView: View {
-    
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
     var cardPack: CardPack
     
-    @State private var currentCardIndex = 0 // Tracks the index of the current card
-    @State private var offset = CGSize.zero // Tracks drag gesture offset
-    @State private var flipped = false // Tracks flipped state for the current card
+    @State private var currentCardIndex = 0
+    @State private var offset = CGSize.zero
+    @State private var flipped = false
     
-    @State private var learnedCardCount = 0
-    @State private var reviewCardCount = 0
-    
-    
+    private var cardsToReview: [FlashCard] {
+        cardPack.cards.filter { !$0.isMastered }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 AppColors.mainBlue.ignoresSafeArea()
                 VStack {
-                    HStack {
-                        Text("\(reviewCardCount )").title3Style()
-                        Spacer()
-                        Text("\(learnedCardCount)").title3Style()
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, -30)
-                    .background(AppColors.mainBlue)
-                    
                     ZStack {
                         AppColors.mainBlue.ignoresSafeArea()
                         
-                        if currentCardIndex < cardPack.cards.count {
-                            let currentCard = cardPack.cards[currentCardIndex]
+                        if currentCardIndex < cardsToReview.count {
+                            let currentCard = cardsToReview[currentCardIndex]
                             
                             FlashCardView(
                                 frontText: currentCard.frontText,
@@ -43,7 +31,7 @@ struct FlashCardsView: View {
                                 isFlipped: flipped
                             )
                             .offset(x: offset.width, y: 0)
-                            .rotationEffect(.degrees(Double(offset.width / 10))) // Add a tilt effect
+                            .rotationEffect(.degrees(Double(offset.width / 10)))
                             .gesture(
                                 DragGesture()
                                     .onChanged { gesture in
@@ -51,13 +39,10 @@ struct FlashCardsView: View {
                                     }
                                     .onEnded { _ in
                                         if offset.width > 100 {
-                                            // Swiped right: learned word
-                                            handleSwipeRight()
+                                            handleSwipeRight(currentCard)
                                         } else if offset.width < -100 {
-                                            // Swiped left: needs review
-                                            handleSwipeLeft()
+                                            handleSwipeLeft(currentCard)
                                         } else {
-                                            // Reset if not far enough
                                             resetCard()
                                         }
                                     }
@@ -68,56 +53,58 @@ struct FlashCardsView: View {
                                 }
                             }
                         } else {
-                            Text("You've reviewed all cards!")
-                                .font(.title)
-                                .foregroundColor(.white)
-                            
-                        }
-                        
-                    }
-                    .navigationBarBackButtonHidden(true)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button(action: {
-                                dismiss() // Dismiss the view
-                            }) {
-                                HStack(spacing: 5) {
-                                    Text("+")
-                                        .rotationEffect(.degrees(45))
-                                        .title1Style()
+                            VStack(spacing: 20) {
+                                Text(cardsToReview.isEmpty ? "All cards mastered!" : "Review incomplete cards")
+                                    .font(.title)
+                                    .foregroundColor(.white)
+                                
+                                Button("Restart Unmastered Cards") {
+                                    resetReview()
                                 }
+                                .buttonStyle(.borderedProminent)
+                                .tint(.orange)
+                                
+                                Button("Reset All Cards") {
+                                    resetAllCards()
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.blue)
                             }
                         }
-                        
-                        ToolbarItem(placement: .principal) {
-                            Text("\(currentCardIndex)/\(cardPack.cards.count)").title3Style()
-                        }
                     }
-                    
                 }
             }
-            
-        
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { dismiss() }) {
+                        HStack(spacing: 5) {
+                            Text("+")
+                                .rotationEffect(.degrees(45))
+                                .title1Style()
+                        }
+                    }
+                }
+                ToolbarItem(placement: .principal) {
+                    Text("\(currentCardIndex)/\(cardsToReview.count)")
+                        .title3Style()
+                }
+            }
         }
-
     }
     
     // MARK: - Swipe Handlers
     
-    private func handleSwipeRight() {
-        // Move to next card: Word learned
-        print("Card learned")
-        learnedCardCount += 1
+    private func handleSwipeRight(_ card: FlashCard) {
+        card.isMastered = true
         moveToNextCard()
     }
-    
-    private func handleSwipeLeft() {
-        // Move to next card: Needs review
-        print("Needs review")
-        reviewCardCount += 1
+
+    private func handleSwipeLeft(_ card: FlashCard) {
+        card.isMastered = false
         moveToNextCard()
     }
-    
+
     private func moveToNextCard() {
         withAnimation {
             offset = .zero
@@ -125,13 +112,26 @@ struct FlashCardsView: View {
             currentCardIndex += 1
         }
     }
-    
+
     private func resetCard() {
         withAnimation {
             offset = .zero
         }
     }
+
+    private func resetReview() {
+        currentCardIndex = 0
+        flipped = false
+    }
+
+    private func resetAllCards() {
+        currentCardIndex = 0
+        flipped = false
+        cardPack.cards.forEach { $0.isMastered = false }
+    }
 }
+
+
 
 
 

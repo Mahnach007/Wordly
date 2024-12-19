@@ -44,11 +44,6 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		F55EB34A2D08F1A200CAA3FD /* ViewModels */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
 		F55EB34D2D08F20700CAA3FD /* ViewComponents */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ViewComponents;
@@ -77,7 +72,6 @@
 			children = (
 				F580C0D62D0F6DA70000A5E1 /* ViewExtensions */,
 				F55EB34D2D08F20700CAA3FD /* ViewComponents */,
-				F55EB34A2D08F1A200CAA3FD /* ViewModels */,
 				F55EB3482D08EF9900CAA3FD /* Models */,
 				F55EB3472D08EF8500CAA3FD /* Views */,
 				F55EB33F2D08E88A00CAA3FD /* Fonts */,
@@ -114,7 +108,6 @@
 				F55EB33F2D08E88A00CAA3FD /* Fonts */,
 				F55EB3472D08EF8500CAA3FD /* Views */,
 				F55EB3482D08EF9900CAA3FD /* Models */,
-				F55EB34A2D08F1A200CAA3FD /* ViewModels */,
 				F55EB34D2D08F20700CAA3FD /* ViewComponents */,
 				F580C0D62D0F6DA70000A5E1 /* ViewExtensions */,
 			);

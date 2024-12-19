@@ -27,16 +27,17 @@ struct CardPackViewComponent: View {
 
             // Main Content with Press Behavior
             HStack {
-                Image(systemName: "lanyardcard.fill")
-                    .font(.system(size: 45))
-                    .padding(.leading, 10)
+            
                 VStack(alignment: .leading) {
                     Text(title)
                         .title3Style()
                     Text("Words: \(count)")
                         .bodyStyle()
-                }
+                }.padding(.horizontal)
                 Spacer()
+                Image("cards")
+                    .font(.system(size: 30))
+                    .padding(.horizontal, 10)
             }
             .offset(y: isPressed ? offset : 0)
             .padding(.vertical, 5)
@@ -161,6 +162,59 @@ struct SquareSmallViewComponentButton: ButtonStyle {
                 .foregroundColor(.white)
                 .shadow(color: .white, radius: 3)
                 .offset(y: configuration.isPressed ? 0 : -3)
+                
+        }
+        .frame(width: width, height: height) // Adjust frame size for a balanced look
+    }
+}
+
+
+struct ActionViewComponentButton: ButtonStyle {
+    
+    var icon: String
+    let width: CGFloat
+    let height: CGFloat
+    var mainColor: Color
+    var shadowColor: Color
+    
+    
+    init(
+        icon: String,
+        width: CGFloat = 53,
+        height: CGFloat = 53,
+        mainColor: Color,
+        shadowColor: Color
+    ) {
+        self.icon = icon
+        self.width = width
+        self.height = height
+        self.mainColor = mainColor
+        self.shadowColor = shadowColor
+    }
+    
+    func makeBody(configuration: Configuration) -> some View {
+        let offset = 3.0
+        ZStack {
+            // Shadow Rectangle
+            RoundedRectangle(cornerRadius: 7)
+                .fill(shadowColor)
+                .offset(y: offset)
+            
+            // Main Rectangle
+            RoundedRectangle(cornerRadius: 7)
+                .fill(mainColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7)
+                        .stroke(mainColor, lineWidth: 2)
+                )
+                .offset(y: configuration.isPressed ? offset : -2)
+            
+            // Plus Symbol
+            Text("\(icon)")
+                .title3Style() // Adjusted font size
+                .foregroundColor(.white)
+                .shadow(color: .white, radius: 3)
+                .offset(y: configuration.isPressed ? 0 : -5)
                 
         }
         .frame(width: width, height: height) // Adjust frame size for a balanced look

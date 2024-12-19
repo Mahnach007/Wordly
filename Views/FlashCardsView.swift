@@ -2,16 +2,22 @@ import SwiftUI
 import SwiftData
 import AVFoundation
 
+
+
 struct FlashCardsView: View {
     @Environment(\.dismiss) private var dismiss
     var cardPack: CardPack
-    
+
     @State private var currentCardIndex = 0
     @State private var offset = CGSize.zero
     @State private var flipped = false
-    
-    private var cardsToReview: [FlashCard] {
-        cardPack.cards.filter { !$0.isMastered }
+    @State private var cardsToReview: [FlashCard]
+
+    @State private var reviewMode: Bool = false // Tracks if the user is learning unmastered cards only
+
+    init(cardPack: CardPack) {
+        self.cardPack = cardPack
+        _cardsToReview = State(initialValue: cardPack.cards)
     }
 
     var body: some View {
@@ -19,57 +25,63 @@ struct FlashCardsView: View {
             ZStack {
                 AppColors.mainBlue.ignoresSafeArea()
                 VStack {
-                    ZStack {
-                        AppColors.mainBlue.ignoresSafeArea()
-                        
-                        if currentCardIndex < cardsToReview.count {
-                            let currentCard = cardsToReview[currentCardIndex]
-                            
-                            FlashCardView(
-                                frontText: currentCard.frontText,
-                                backText: currentCard.backText,
-                                isFlipped: flipped
-                            )
-                            .offset(x: offset.width, y: 0)
-                            .rotationEffect(.degrees(Double(offset.width / 10)))
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { gesture in
-                                        offset = gesture.translation
+                    if cardsToReview.isEmpty {
+                        // All cards are mastered
+                        VStack(spacing: 20) {
+                            Text("🎉 Congratulations! 🎉").title1Style()
+                                .font(.largeTitle)
+                                .foregroundColor(.white)
+                            Text("You've mastered all the cards in this pack!").title3Style()
+                                .foregroundColor(.white)
+                            Button("Restart All Cards") {
+                                resetAllCards()
+                            }.buttonStyle(ActionViewComponentButton(icon: "Restart All Cards", width: 153, mainColor: .orange, shadowColor: AppColors.shadowBlue))
+                        }
+                    } else if currentCardIndex < cardsToReview.count {
+                        // Show current card
+                        let currentCard = cardsToReview[currentCardIndex]
+                        FlashCardView(
+                            frontText: currentCard.frontText,
+                            backText: currentCard.backText,
+                            isFlipped: flipped
+                        )
+                        .offset(x: offset.width, y: 0)
+                        .rotationEffect(.degrees(Double(offset.width / 10)))
+                        .gesture(
+                            DragGesture()
+                                .onChanged { gesture in
+                                    offset = gesture.translation
+                                }
+                                .onEnded { _ in
+                                    if offset.width > 100 {
+                                        handleSwipeRight(currentCard) // Mark card as mastered
+                                    } else if offset.width < -100 {
+                                        handleSwipeLeft(currentCard)  // Mark card as unmastered
+                                    } else {
+                                        resetCard()
                                     }
-                                    .onEnded { _ in
-                                        if offset.width > 100 {
-                                            handleSwipeRight(currentCard)
-                                        } else if offset.width < -100 {
-                                            handleSwipeLeft(currentCard)
-                                        } else {
-                                            resetCard()
-                                        }
-                                    }
-                            )
-                            .onTapGesture {
-                                withAnimation {
-                                    flipped.toggle()
                                 }
+                        )
+                        .onTapGesture {
+                            withAnimation { flipped.toggle() }
+                        }
+                    } else {
+                        // End of current round
+                        VStack(spacing: 20) {
+                            Text("Round Complete!")
+                                .title1Style()
+                                .font(.title)
+                                .foregroundColor(.white)
+                            Text("What would you like to do next?")
+                                .title3Style()
+                                .foregroundColor(.white)
+                            Button("Review Unmastered Cards") {
+                                reviewUnmasteredCards()
                             }
-                        } else {
-                            VStack(spacing: 20) {
-                                Text(cardsToReview.isEmpty ? "All cards mastered!" : "Review incomplete cards")
-                                    .font(.title)
-                                    .foregroundColor(.white)
-                                
-                                Button("Restart Unmastered Cards") {
-                                    resetReview()
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .tint(.orange)
-                                
-                                Button("Reset All Cards") {
-                                    resetAllCards()
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(.blue)
-                            }
+                            .buttonStyle(ActionViewComponentButton(icon: "Review Unmastered Cards", width: 153, mainColor: .orange, shadowColor: AppColors.shadowBlue))
+                            Button("") {
+                                resetAllCards()
+                            }.buttonStyle(ActionViewComponentButton(icon: "Restart All Cards", width: 153, mainColor: AppColors.mainGreen, shadowColor: AppColors.shadowGreen))
                         }
                     }
                 }
@@ -87,20 +99,22 @@ struct FlashCardsView: View {
                 }
                 ToolbarItem(placement: .principal) {
                     Text("\(currentCardIndex)/\(cardsToReview.count)")
-                        .title3Style()
+                                .title3Style()
                 }
             }
         }
     }
-    
+
     // MARK: - Swipe Handlers
-    
+
     private func handleSwipeRight(_ card: FlashCard) {
+        // Mark the card as mastered
         card.isMastered = true
         moveToNextCard()
     }
 
     private func handleSwipeLeft(_ card: FlashCard) {
+        // Keep the card as unmastered
         card.isMastered = false
         moveToNextCard()
     }
@@ -114,22 +128,30 @@ struct FlashCardsView: View {
     }
 
     private func resetCard() {
-        withAnimation {
-            offset = .zero
-        }
+        offset = .zero
+        flipped = false
     }
 
-    private func resetReview() {
+    // MARK: - Review Modes
+
+    private func reviewUnmasteredCards() {
+        // Filter only unmastered cards for the next round
+        cardsToReview = cardPack.cards.filter { !$0.isMastered }
         currentCardIndex = 0
         flipped = false
+        reviewMode = true
     }
 
     private func resetAllCards() {
+        // Reset all cards to unmastered state
+        cardPack.cards.forEach { $0.isMastered = false }
+        cardsToReview = cardPack.cards
         currentCardIndex = 0
         flipped = false
-        cardPack.cards.forEach { $0.isMastered = false }
+        reviewMode = false
     }
 }
+
 
 
 
